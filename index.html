@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>[你的團隊名稱] — connecting...</title>
+<title>GOODFUN TEAM — connecting...</title>
 <meta name="theme-color" content="#000000" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.85em%22 font-size=%2280%22 fill=%22%2300ff66%22>▓</text></svg>" />
 
@@ -12,16 +12,14 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 
 <!-- ============================================================
-     🔧 GOOGLE ANALYTICS 4 設定
-     把下面兩處的 G-XXXXXXXXXX 換成你自己的 GA4 測量 ID
-     （GA4 後台 → 管理 → 資料串流 → 你的網站 → 測量 ID）
+     🔧 GOOGLE ANALYTICS 4：已填入「IG跳轉頁」資源的評估 ID
      ============================================================ -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QZTX565D1J"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){ dataLayer.push(arguments); }
   gtag('js', new Date());
-  gtag('config', 'G-XXXXXXXXXX'); // 👈 換成你的 GA4 測量 ID
+  gtag('config', 'G-QZTX565D1J');
 </script>
 
 <style>
@@ -148,7 +146,7 @@
 <main class="term">
   <div class="term-bar">
     <span class="dot"></span>
-    <span>[你的團隊名稱] :: secure_channel</span>
+    <span>GOODFUN TEAM :: secure_channel</span>
   </div>
   <div id="log"></div>
   <p class="fallback">沒有自動跳轉？<a id="manualLink" href="#">點我前往 Instagram</a></p>
@@ -157,7 +155,7 @@
 <script>
 /* 📝 只要改這一行網址與下面的團隊名稱就好 */
 const IG_URL = "https://www.instagram.com/goodfun.team";
-const TEAM_NAME = "[GOODFUN TEAM]";
+const TEAM_NAME = "GOODFUN TEAM";
 
 document.getElementById("manualLink").href = IG_URL;
 document.querySelector(".term-bar span:last-child").textContent = TEAM_NAME + " :: secure_channel";
@@ -169,7 +167,7 @@ const LINES = [
   { text: "> scanning QR signature ... OK", cls: "" },
   { text: "> verifying origin ... OK", cls: "" },
   { text: "> ACCESS GRANTED", cls: "ok" },
-  { text: "> redirecting to instagram.com/your_team", cls: "dim" }
+  { text: "> redirecting to instagram.com/goodfun.team", cls: "dim" }
 ];
 
 const logEl = document.getElementById("log");
