@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>[你的團隊名稱] — connecting...</title>
+<meta name="theme-color" content="#000000" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.85em%22 font-size=%2280%22 fill=%22%2300ff66%22>▓</text></svg>" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<!-- ============================================================
+     🔧 GOOGLE ANALYTICS 4 設定
+     把下面兩處的 G-XXXXXXXXXX 換成你自己的 GA4 測量 ID
+     （GA4 後台 → 管理 → 資料串流 → 你的網站 → 測量 ID）
+     ============================================================ -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX'); // 👈 換成你的 GA4 測量 ID
+</script>
+
+<style>
+  :root{
+    --bg:#050705;
+    --green:#39ff6a;
+    --green-dim:#1c8f3d;
+    --white:#eafff0;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; height:100%; }
+  body{
+    background:var(--bg);
+    color:var(--green);
+    font-family:'JetBrains Mono', ui-monospace, monospace;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    position:relative;
+  }
+
+  canvas#rain{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    opacity:.45;
+  }
+
+  /* CRT 掃描線疊層 */
+  .scanlines{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0) 0px,
+      rgba(0,0,0,0) 1px,
+      rgba(0,0,0,.25) 2px,
+      rgba(0,0,0,.25) 3px
+    );
+    mix-blend-mode:multiply;
+    z-index:3;
+  }
+  .vignette{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,.75) 100%);
+    z-index:3;
+  }
+
+  .term{
+    position:relative;
+    z-index:4;
+    width:100%;
+    max-width:520px;
+    margin:0 24px;
+    padding:26px 24px;
+    background:rgba(3,8,4,.72);
+    border:1px solid var(--green-dim);
+    border-radius:6px;
+    box-shadow:0 0 0 1px rgba(57,255,106,.08), 0 0 40px -6px rgba(57,255,106,.25);
+    backdrop-filter:blur(2px);
+  }
+
+  .term-bar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:16px;
+    padding-bottom:10px;
+    border-bottom:1px solid var(--green-dim);
+    font-size:11px;
+    letter-spacing:.08em;
+    color:var(--green-dim);
+    text-transform:uppercase;
+  }
+  .dot{ width:8px; height:8px; border-radius:50%; background:var(--green-dim); }
+
+  #log{
+    font-size:14px;
+    line-height:1.85;
+    white-space:pre-wrap;
+    word-break:break-word;
+    min-height:190px;
+    text-shadow:0 0 6px rgba(57,255,106,.55);
+  }
+  #log .ok{ color:var(--white); text-shadow:0 0 8px rgba(234,255,240,.7); }
+  #log .dim{ color:var(--green-dim); }
+
+  .cursor{
+    display:inline-block;
+    width:8px;
+    height:15px;
+    background:var(--green);
+    vertical-align:middle;
+    margin-left:2px;
+    animation: blink 1s steps(1) infinite;
+    box-shadow:0 0 6px rgba(57,255,106,.8);
+  }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  .fallback{
+    margin-top:18px;
+    font-size:11.5px;
+    color:var(--green-dim);
+  }
+  .fallback a{ color:var(--green); }
+
+  @media (prefers-reduced-motion: reduce){
+    .cursor{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="rain"></canvas>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+
+<main class="term">
+  <div class="term-bar">
+    <span class="dot"></span>
+    <span>[你的團隊名稱] :: secure_channel</span>
+  </div>
+  <div id="log"></div>
+  <p class="fallback">沒有自動跳轉？<a id="manualLink" href="#">點我前往 Instagram</a></p>
+</main>
+
+<script>
+/* 📝 只要改這一行網址與下面的團隊名稱就好 */
+const IG_URL = "https://instagram.com/your_team";
+const TEAM_NAME = "[你的團隊名稱]";
+
+document.getElementById("manualLink").href = IG_URL;
+document.querySelector(".term-bar span:last-child").textContent = TEAM_NAME + " :: secure_channel";
+
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const LINES = [
+  { text: "> initializing secure_channel...", cls: "" },
+  { text: "> scanning QR signature ... OK", cls: "" },
+  { text: "> verifying origin ... OK", cls: "" },
+  { text: "> ACCESS GRANTED", cls: "ok" },
+  { text: "> redirecting to instagram.com/your_team", cls: "dim" }
+];
+
+const logEl = document.getElementById("log");
+
+function redirect(){
+  window.location.href = IG_URL;
+}
+
+function typeLines(lines, onDone){
+  let li = 0, ci = 0;
+  const cursor = document.createElement("span");
+  cursor.className = "cursor";
+
+  function step(){
+    if (li >= lines.length){
+      onDone();
+      return;
+    }
+    const line = lines[li];
+    if (ci === 0){
+      const p = document.createElement("div");
+      if (line.cls) p.className = line.cls;
+      p.textContent = "";
+      logEl.appendChild(p);
+    }
+    const currentP = logEl.lastElementChild;
+    currentP.textContent = line.text.slice(0, ci + 1);
+    currentP.appendChild(cursor);
+    ci++;
+    if (ci >= line.text.length){
+      li++; ci = 0;
+      setTimeout(step, 220);
+    } else {
+      setTimeout(step, 16 + Math.random() * 20);
+    }
+  }
+  step();
+}
+
+if (reduceMotion){
+  LINES.forEach(l => {
+    const p = document.createElement("div");
+    if (l.cls) p.className = l.cls;
+    p.textContent = l.text;
+    logEl.appendChild(p);
+  });
+  setTimeout(redirect, 500);
+} else {
+  typeLines(LINES, () => setTimeout(redirect, 550));
+}
+
+/* ---- 背景數位雨 ---- */
+const canvas = document.getElementById("rain");
+const ctx = canvas.getContext("2d");
+let w, h, columns, drops;
+const CHARS = "アイウエオカキクケコサシスセソ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ<>/*-+#$%";
+
+function resize(){
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+  const fontSize = 15;
+  columns = Math.floor(w / fontSize);
+  drops = new Array(columns).fill(0).map(() => Math.random() * -40);
+}
+resize();
+window.addEventListener("resize", resize);
+
+function drawRain(){
+  ctx.fillStyle = "rgba(2,5,3,0.12)";
+  ctx.fillRect(0, 0, w, h);
+  ctx.font = "15px monospace";
+  for (let i = 0; i < columns; i++){
+    const char = CHARS[Math.floor(Math.random() * CHARS.length)];
+    const x = i * 15;
+    const y = drops[i] * 15;
+    ctx.fillStyle = Math.random() > 0.94 ? "#eafff0" : "#39ff6a";
+    ctx.fillText(char, x, y);
+    if (y > h && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  }
+}
+
+if (!reduceMotion){
+  setInterval(drawRain, 55);
+} else {
+  ctx.fillStyle = "#050705";
+  ctx.fillRect(0, 0, w, h);
+}
+</script>
+
+</body>
+</html>
